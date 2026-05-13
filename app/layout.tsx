@@ -22,10 +22,8 @@ export const metadata: Metadata = {
     default: "raraprojects — Web & Digital Agency",
     template: "%s | raraprojects",
   },
-  description: {
-    tr: "Küçük işletmeler için hızlı, modern web siteleri. Cloudflare Pages, Next.js ve AI destekli tasarım. 35+ proje, hızlı teslimat.",
-    en: "Fast, modern websites for small businesses. Cloudflare Pages, Next.js and AI-powered design. 35+ projects, quick delivery.",
-  },
+  description:
+    "Küçük işletmeler için hızlı, modern web siteleri. Cloudflare Pages, Next.js ve AI destekli tasarım. 35+ proje, hızlı teslimat.",
   keywords: ["web design", "web development", "Next.js", "Cloudflare", "Türkiye", "Istanbul", "small business website", "kurumsal web", "e-ticaret"],
   authors: [{ name: "Ragıp Balcı" }],
   creator: "Ragıp Balcı — raraprojects",
@@ -68,7 +66,6 @@ export default function RootLayout({
   return (
     <html lang="tr" className={`${syne.variable} ${outfit.variable} h-full`}>
       <head>
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <script
           type="application/ld+json"

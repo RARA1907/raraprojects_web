@@ -34,7 +34,7 @@ export default function Navbar() {
         </a>
 
         {/* Links */}
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="flex items-center gap-8">
           {navLinks.map((l) => (
             <li key={l.href}>
               <a
@@ -50,19 +50,10 @@ export default function Navbar() {
         {/* CTA */}
         <a
           href="#contact"
-          className="hidden md:inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:bg-[#e0e0e0] transition-colors duration-200 font-[family-name:var(--font-outfit)]"
+          className="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:bg-[#e0e0e0] transition-colors duration-200 font-[family-name:var(--font-outfit)]"
         >
           Get in touch
         </a>
-
-        {/* Mobile menu placeholder */}
-        <button className="md:hidden text-[#888] hover:text-white">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <rect y="3" width="20" height="2" rx="1" />
-            <rect y="9" width="20" height="2" rx="1" />
-            <rect y="15" width="20" height="2" rx="1" />
-          </svg>
-        </button>
       </nav>
     </header>
   );
