@@ -1,14 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const TURNSTILE_SITE_KEY = "0x4AAAAAAB8jgvpN8NGUuycc";
-const WORKER_URL = "https://raraprojects-contact.pages.dev";
 
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({ name: "", phone: "", business: "", message: "" });
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    const interval = setInterval(() => {
+      if ((window as any).turnstile && turnstileRef.current && !widgetIdRef.current) {
+        clearInterval(interval);
+        widgetIdRef.current = (window as any).turnstile.render(turnstileRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: "dark",
+          callback: (token: string) => {
+            (window as any).turnstileToken = token;
+          },
+        }) as string;
+      }
+    }, 200);
+
+    return () => {
+      clearInterval(interval);
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +44,9 @@ export default function Contact() {
     setErrorMsg("");
 
     try {
-      const turnstileToken = (window as any).turnstile?.render?.getResponse?.() || "";
+      const turnstileToken = (window as any).turnstileToken || "";
 
-      const res = await fetch(WORKER_URL, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, turnstileToken }),
@@ -145,11 +171,7 @@ export default function Contact() {
                 />
               </div>
 
-              <div ref={(el) => {
-                if (el && typeof window !== "undefined" && (window as any).turnstile) {
-                  try { (window as any).turnstile.render(el, { sitekey: TURNSTILE_SITE_KEY, callback: (token: string) => { (window as any).turnstileToken = token; } }); } catch {}
-                }
-              }} />
+              <div ref={turnstileRef} />
 
               {status === "error" && (
                 <p className="font-[family-name:var(--font-outfit)] text-red-400 text-xs">{errorMsg}</p>
