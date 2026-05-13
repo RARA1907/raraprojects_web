@@ -32,24 +32,16 @@ export async function onRequestPost(context) {
       return json({ error: "CAPTCHA verification failed" }, 400);
     }
 
-    // Send via Resend
-    const resendRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "raraprojects <noreply@raraprojects.com>",
-        to: ["rara@raraprojects.com"],
-        subject: `New Contact: ${name}${business ? ` — ${business}` : ""}`,
-        text: [
-          `Name: ${name}`,
-          `Phone: ${phone || "Not provided"}`,
-          `Business: ${business || "Not provided"}`,
-          `Message: ${message}`,
-        ].join("\n"),
-        html: `
+    const payload = {
+      to: ["rara@raraprojects.com"],
+      subject: `New Contact: ${name}${business ? ` — ${business}` : ""}`,
+      text: [
+        `Name: ${name}`,
+        `Phone: ${phone || "Not provided"}`,
+        `Business: ${business || "Not provided"}`,
+        `Message: ${message}`,
+      ].join("\n"),
+      html: `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -75,12 +67,24 @@ export async function onRequestPost(context) {
   </div>
 </body>
 </html>`,
-      }),
-    });
+    };
+
+    // Primary sender with branded domain; fallback keeps inbox flow alive
+    // when domain verification is not yet complete in Resend.
+    let resendRes = await sendViaResend(env.RESEND_API_KEY, "raraprojects <noreply@raraprojects.com>", payload);
+    if (!resendRes.ok) {
+      const firstErrText = await resendRes.text();
+      if (firstErrText.includes("domain is not verified")) {
+        resendRes = await sendViaResend(env.RESEND_API_KEY, "onboarding@resend.dev", payload);
+      } else {
+        console.error("Resend error:", firstErrText);
+        return json({ error: "Failed to send message" }, 500);
+      }
+    }
 
     if (!resendRes.ok) {
       const err = await resendRes.text();
-      console.error("Resend error:", err);
+      console.error("Resend fallback error:", err);
       return json({ error: "Failed to send message" }, 500);
     }
 
@@ -105,6 +109,20 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function sendViaResend(apiKey, from, payload) {
+  return fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      from,
+      ...payload,
+    }),
+  });
 }
 
 export async function onRequest() {
