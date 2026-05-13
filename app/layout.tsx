@@ -3,28 +3,60 @@ import { Syne, Outfit } from "next/font/google";
 import "./globals.css";
 
 const syne = Syne({
-  variable: "--font-outfit", // Syne → body (geometric, karakterli)
+  variable: "--font-outfit",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
 
 const outfit = Outfit({
-  variable: "--font-syne", // Outfit → headings (güzel "a", bold'da parlıyor)
+  variable: "--font-syne",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const TURNSTILE_SITE_KEY = "0x4AAAAAAB8jgvpN8NGUuycc";
+
 export const metadata: Metadata = {
-  title: "raraprojects — Web & Digital",
-  description:
-    "Küçük işletmeler için hızlı, modern web siteleri. Fast, modern websites for small businesses.",
+  metadataBase: new URL("https://raraprojects.com"),
+  title: {
+    default: "raraprojects — Web & Digital Agency",
+    template: "%s | raraprojects",
+  },
+  description: {
+    tr: "Küçük işletmeler için hızlı, modern web siteleri. Cloudflare Pages, Next.js ve AI destekli tasarım. 35+ proje, hızlı teslimat.",
+    en: "Fast, modern websites for small businesses. Cloudflare Pages, Next.js and AI-powered design. 35+ projects, quick delivery.",
+  },
+  keywords: ["web design", "web development", "Next.js", "Cloudflare", "Türkiye", "Istanbul", "small business website", "kurumsal web", "e-ticaret"],
+  authors: [{ name: "Ragıp Balcı" }],
+  creator: "Ragıp Balcı — raraprojects",
   openGraph: {
-    title: "raraprojects",
-    description: "Web design & development by Ragıp Balcı",
+    type: "website",
+    locale: "tr_TR",
     url: "https://raraprojects.com",
     siteName: "raraprojects",
-    locale: "tr_TR",
-    type: "website",
+    title: "raraprojects — Web & Digital Agency",
+    description: "Fast, modern websites for small businesses. Cloudflare Pages, Next.js and AI-powered design.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "raraprojects — Web & Digital Agency",
+    description: "Fast, modern websites for small businesses.",
+    creator: "@raraprojects",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-code",
   },
 };
 
@@ -34,10 +66,39 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="tr"
-      className={`${syne.variable} ${outfit.variable} h-full`}
-    >
+    <html lang="tr" className={`${syne.variable} ${outfit.variable} h-full`}>
+      <head>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ProfessionalService",
+              name: "raraprojects",
+              description: "Fast, modern websites for small businesses. Cloudflare Pages, Next.js and AI-powered design.",
+              url: "https://raraprojects.com",
+              telephone: "+90-535-480-0478",
+              email: "rara@raraprojects.com",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Istanbul",
+                addressCountry: "TR",
+              },
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: "41.0082",
+                longitude: "28.9784",
+              },
+              areaServed: "Türkiye",
+              priceRange: "$$",
+              serviceType: ["Web Design", "Web Development", "Hosting", "SEO"],
+              sameAs: ["https://github.com/RARA1907"],
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-full bg-rp-bg text-rp-text antialiased">
         {children}
       </body>

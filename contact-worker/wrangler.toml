@@ -1,0 +1,12 @@
+name = "raraprojects-contact"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+RESEND_API_KEY = "re_B39VDKqB_Ag6bR3H4a8nQxNcz6FR83jfX"
+RESEND_FROM = "raraprojects <noreply@raraprojects.com>"
+RESEND_TO = "rara@raraprojects.com"
+TURNSTILE_SECRET = "0x4AAAAAAB8jgoqVPhq1kjiLw_5dNWsEYRQ"
+
+[observability]
+enabled = true
