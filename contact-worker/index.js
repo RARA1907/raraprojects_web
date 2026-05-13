@@ -3,13 +3,11 @@
  * Handles contact form submissions, verifies Turnstile CAPTCHA, sends email via Resend
  */
 
-const RESEND_API_KEY = 're_B39VDKqB_Ag6bR3H4a8nQxNcz6FR83jfX';
 const RESEND_FROM = 'raraprojects <noreply@raraprojects.com>';
 const RESEND_TO = 'rara@raraprojects.com';
-const TURNSTILE_SECRET = '0x4AAAAAAB8jgoqVPhq1kjiLw_5dNWsEYRQ';
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     if (request.method !== 'POST') {
       return json({ error: 'Method not allowed' }, 405);
     }
@@ -24,7 +22,7 @@ export default {
       }
 
       // Verify Turnstile token
-      const turnstileResult = await verifyTurnstile(turnstileToken);
+      const turnstileResult = await verifyTurnstile(turnstileToken, env.TURNSTILE_SECRET_KEY);
       if (!turnstileResult.success) {
         return json({ error: 'CAPTCHA verification failed' }, 400);
       }
@@ -35,7 +33,7 @@ export default {
         phone: phone?.trim() || 'Not provided',
         business: business?.trim() || 'Not provided',
         message: message.trim(),
-      });
+      }, env.RESEND_API_KEY);
 
       if (!emailResult.success) {
         return json({ error: 'Failed to send message' }, 500);
@@ -49,13 +47,13 @@ export default {
   }
 };
 
-async function verifyTurnstile(token) {
+async function verifyTurnstile(token, secret) {
   try {
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        secret: TURNSTILE_SECRET,
+        secret,
         response: token,
         remoteip: '127.0.0.1',
       }),
@@ -67,13 +65,13 @@ async function verifyTurnstile(token) {
   }
 }
 
-async function sendEmail({ name, phone, business, message }) {
+async function sendEmail({ name, phone, business, message }, resendApiKey) {
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
         from: RESEND_FROM,

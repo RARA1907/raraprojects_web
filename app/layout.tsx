@@ -14,8 +14,6 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const TURNSTILE_SITE_KEY = "0x4AAAAAAB8jgvpN8NGUuycc";
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://raraprojects.com"),
   title: {

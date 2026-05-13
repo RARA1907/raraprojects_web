@@ -4,12 +4,33 @@ import { useState, useEffect, useRef } from "react";
 
 const TURNSTILE_SITE_KEY = "0x4AAAAAAB8jgvpN8NGUuycc";
 
+type TurnstileWidgetId = string | number;
+
+type TurnstileApi = {
+  render: (
+    container: HTMLElement,
+    options: {
+      sitekey: string;
+      theme: "light" | "dark" | "auto";
+      callback: (token: string) => void;
+    }
+  ) => TurnstileWidgetId;
+  reset?: (widgetId?: TurnstileWidgetId) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+    turnstileToken?: string;
+  }
+}
+
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({ name: "", phone: "", business: "", message: "" });
   const turnstileRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
+  const widgetIdRef = useRef<TurnstileWidgetId | null>(null);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -18,15 +39,15 @@ export default function Contact() {
     document.head.appendChild(script);
 
     const interval = setInterval(() => {
-      if ((window as any).turnstile && turnstileRef.current && !widgetIdRef.current) {
+      if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
         clearInterval(interval);
-        widgetIdRef.current = (window as any).turnstile.render(turnstileRef.current, {
+        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
           theme: "dark",
           callback: (token: string) => {
-            (window as any).turnstileToken = token;
+            window.turnstileToken = token;
           },
-        }) as string;
+        });
       }
     }, 200);
 
@@ -44,7 +65,7 @@ export default function Contact() {
     setErrorMsg("");
 
     try {
-      const turnstileToken = (window as any).turnstileToken || "";
+      const turnstileToken = window.turnstileToken || "";
 
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -55,8 +76,12 @@ export default function Contact() {
       if (res.ok) {
         setStatus("success");
         setFormData({ name: "", phone: "", business: "", message: "" });
+        window.turnstileToken = "";
+        if (widgetIdRef.current !== null) {
+          window.turnstile?.reset?.(widgetIdRef.current);
+        }
       } else {
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
         setErrorMsg(data.error || "Something went wrong");
         setStatus("error");
       }

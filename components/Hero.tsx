@@ -11,30 +11,14 @@ export default function Hero() {
 
       <div className="max-w-6xl mx-auto w-full relative">
 
-        {/* Badge */}
-        <div className="fade-up fade-up-1 inline-flex items-center gap-2 border border-[#1C1C1C] rounded-full px-4 py-1.5 mb-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: "0 0 6px #4ade80" }} />
-          <span className="text-xs text-[#606060] font-[family-name:var(--font-outfit)] tracking-wide">
-            Available for new projects
-          </span>
-        </div>
-
         {/* Heading — editorial scale */}
         <h1 className="fade-up fade-up-2 font-[family-name:var(--font-syne)] font-extrabold leading-[0.95] tracking-tight text-[#EBEBEB] mb-8"
           style={{ fontSize: "clamp(3.5rem, 10vw, 9rem)" }}>
-          We build<br />
-          websites<br />
-          <span style={{ color: "#2a2a2a", WebkitTextStroke: "1px #333" }}>
-            that work.
-          </span>
+          Portfolio
         </h1>
 
-        {/* Sub + CTAs row */}
+        {/* CTAs row */}
         <div className="fade-up fade-up-3 flex flex-col md:flex-row md:items-end gap-8 md:gap-16 mb-0">
-          <p className="font-[family-name:var(--font-outfit)] text-[#606060] text-lg max-w-sm leading-relaxed">
-            Fast, modern web presence for small businesses — delivered in days, not months.
-          </p>
-
           <div className="flex flex-wrap gap-3">
             <a
               href="#work"

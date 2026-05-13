@@ -1,9 +1,7 @@
 /**
  * Contact Form — CF Pages Function
- * POST /contact → sends email via Resend + Turnstile verification
+ * POST /api/contact → sends email via Resend + Turnstile verification
  */
-
-const TURNSTILE_SECRET = "0x4AAAAAAB8jgoqVPhq1kjiLw_5dNWsEYRQ";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -23,7 +21,7 @@ export async function onRequestPost(context) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          secret: TURNSTILE_SECRET,
+          secret: env.TURNSTILE_SECRET_KEY,
           response: turnstileToken || "",
           remoteip: request.headers.get("CF-Connecting-IP") || "127.0.0.1",
         }),
@@ -109,6 +107,6 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-export async function onRequest(context) {
+export async function onRequest() {
   return json({ error: "Method not allowed" }, 405);
 }
